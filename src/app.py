@@ -231,7 +231,7 @@ def create_planet_fav(user_id, planet_id ):
         return jsonify({"msg": "El planeta ya esta en favoritos "}), 400
 
 
-    fav= Favorites(id_user= user_id, id_planet=planet_id)
+    fav= Favorite(id_user= user_id, id_planet=planet_id)
 
     db.session.add(fav)
     db.session.commit()
@@ -291,6 +291,43 @@ def delete_favorite_planet(planet_id, user_id):
 
         return jsonify({
             "msg": "El planeta fue eliminado de favoritos"
+        }), 200
+
+    except Exception as e:
+
+        db.session.rollback()
+
+        return jsonify({
+            "error": "Something went wrong",
+            "message": str(e)
+        }), 500
+    
+@app.route('/users/<int:user_id>/favorite/character/<int:character_id>', methods=['DELETE'])
+def delete_favorite_character(character_id, user_id):
+
+    try:
+
+        user= User.query.get(user_id)
+        if not user:
+            return jsonify({"msg": "no se encontro el usuario"}), 400
+    
+        # buscamos el favorito
+        favorite = Favorite.query.filter_by(
+            character_id=character_id
+        ).first()
+
+        # validamos si existe
+        if not favorite:
+            return jsonify({
+                "msg": "El personaje no esta en favoritos"
+            }), 404
+
+        # eliminamos favorito
+        db.session.delete(favorite)
+        db.session.commit()
+
+        return jsonify({
+            "msg": "El personaje fue eliminado de favoritos"
         }), 200
 
     except Exception as e:

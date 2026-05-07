@@ -211,6 +211,62 @@ def get_favorites():
             "message": str(e)
         }), 500
 
+@app.route('/users/<int:user_id>/favorite/planet/<int:planet_id>', methods=['POST'])
+def create_planet_fav(user_id, planet_id ):
+
+    user= User.query.get(user_id)
+    if not user:
+        return jsonify({"msg": "no se encontro el usuario"}), 400
+
+    planet= Planets.query.get(planet_id)
+    if not planet:
+        return jsonify({"msg": "no se encontro el planeta"}), 400
+
+    #verificamos si ya existe un registro de favoritos con esos datos
+    exists= Favorites.query.filter_by(
+        id_user=user_id,
+        id_planet=planet_id
+    ).first()
+    if exists:
+        return jsonify({"msg": "El planeta ya esta en favoritos "}), 400
+
+
+    fav= Favorites(id_user= user_id, id_planet=planet_id)
+
+    db.session.add(fav)
+    db.session.commit()
+
+    return jsonify({"msg": "El planeta se agrego a favoritos"}), 201
+
+@app.route('/users/<int:user_id>/favorite/character/<int:character_id>', methods=['POST'])
+def create_character_fav(user_id, character_id ):
+
+    user= User.query.get(user_id)
+    if not user:
+        return jsonify({"msg": "no se encontro el usuario"}), 400
+
+    character= character.query.get(character_id)
+    if not character:
+        return jsonify({"msg": "no se encontro el personaje"}), 400
+
+    #verificamos si ya existe un registro de favoritos con esos datos
+    exists= Favorite.query.filter_by(
+        id_user=user_id,
+        id_charcater=character_id
+    ).first()
+    if exists:
+        return jsonify({"msg": "El personaje ya esta en favoritos "}), 400
+
+
+    fav= Favorite(id_user= user_id, id_character=character_id)
+
+    db.session.add(fav)
+    db.session.commit()
+
+    return jsonify({"msg": "El personaje se agrego a favoritos"}), 201
+
+
+
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3000))

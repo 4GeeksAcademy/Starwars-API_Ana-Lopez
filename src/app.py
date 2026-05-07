@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User, Planets, Character
+from models import db, User, Planets, Character, Favorite
 #from models import Person
 
 app = Flask(__name__)
@@ -119,6 +119,66 @@ def get_characters():
     except Exception as e:
 
         # Manejo de errores
+        return jsonify({
+            "error": "Something went wrong",
+            "message": str(e)
+        }), 500
+    
+@app.route('/character/<int:character_id>', methods=['GET'])
+def get_single_character(character_id):
+
+    try:
+
+        # Buscar personaje por ID
+        character = Character.query.get(character_id)
+
+        # Validar si no existe
+        if character is None:
+            return jsonify({
+                "message": "Character not found"
+            }), 404
+
+        # Respuesta exitosa
+        return jsonify({
+            "result": character.serialize()
+        }), 200
+
+    except Exception as e:
+
+        # Manejo de errores
+        return jsonify({
+            "error": "Something went wrong",
+            "message": str(e)
+        }), 500
+
+
+@app.route('/users/favorites', methods=['GET'])
+def get_favorites():
+
+    try:
+
+        # Simular usuario actual
+        current_user_id = 1
+
+        # Buscar favoritos del usuario
+        favorites = Favorite.query.filter_by(user_id=current_user_id).all()
+
+        # Validar lista vacía
+        if len(favorites) == 0:
+            return jsonify({
+                "message": "No favorites found"
+            }), 404
+
+        # Serializar favoritos
+        favorites_list = [favorite.serialize() for favorite in favorites]
+
+        # Respuesta exitosa
+        return jsonify({
+            "results": favorites_list
+        }), 200
+
+    except Exception as e:
+
         return jsonify({
             "error": "Something went wrong",
             "message": str(e)

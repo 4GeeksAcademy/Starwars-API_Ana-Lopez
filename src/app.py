@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User, Planets
+from models import db, User, Planets, Character
 #from models import Person
 
 app = Flask(__name__)
@@ -89,6 +89,36 @@ def get_planets():
     except Exception as e:
 
         # Manejo de errores inesperados
+        return jsonify({
+            "error": "Something went wrong",
+            "message": str(e)
+        }), 500
+    
+@app.route('/character', methods=['GET'])
+def get_characters():
+
+    try:
+
+        # Buscar todos los personajes
+        characters = Character.query.all()
+
+        # Convertir objetos a diccionarios
+        characters_list = [character.serialize() for character in characters]
+
+        # Validar si no hay personajes
+        if len(characters_list) == 0:
+            return jsonify({
+                "message": "No characters found"
+            }), 404
+
+        # Respuesta exitosa
+        return jsonify({
+            "results": characters_list
+        }), 200
+
+    except Exception as e:
+
+        # Manejo de errores
         return jsonify({
             "error": "Something went wrong",
             "message": str(e)

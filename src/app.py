@@ -37,7 +37,7 @@ def sitemap():
     return generate_sitemap(app)
 
 @app.route('/user', methods=['GET'])
-def handle_hello():
+def get_user():
 
     try:
         # consultar a la base de datos los registros de usuarios
@@ -93,7 +93,34 @@ def get_planets():
             "error": "Something went wrong",
             "message": str(e)
         }), 500
-    
+
+@app.route('/planets/<int:planet_id>', methods=['GET'])
+def get_single_planet(planet_id):
+
+    try:
+
+        # Buscar planeta por ID
+        planet = Planets.query.get(planet_id)
+
+        # Validar si existe
+        if planet is None:
+            return jsonify({
+                "message": "Planet not found"
+            }), 404
+
+        # Respuesta exitosa
+        return jsonify({
+            "result": planet.serialize()
+        }), 200
+
+    except Exception as e:
+
+        # Manejo de errores inesperados
+        return jsonify({
+            "error": "Something went wrong",
+            "message": str(e)
+        }), 500
+
 @app.route('/character', methods=['GET'])
 def get_characters():
 

@@ -50,7 +50,7 @@ class Planets(db.Model):
     orbital_period: Mapped[Optional[int]] = mapped_column(Integer, nullable=True, unique=False)
     gravity: Mapped[Optional[str]] = mapped_column(String(50), nullable=True, unique=False)
 
-    favorites: Mapped[List["Favorite"]] = relationship(back_populates="planets")
+    favorites: Mapped[List["Favorite"]] = relationship(back_populates="planet")
    
     def serialize(self):
         return {
@@ -102,4 +102,4 @@ class Favorite(db.Model):
 
     user: Mapped["User"] = relationship(back_populates="favorites")
     character: Mapped[Optional["Character"]] = relationship(back_populates="favorites")
-    planets: Mapped[Optional["Planets"]] = relationship(back_populates="favorites")
+    planet: Mapped[Optional["Planets"]] = relationship(back_populates="favorites")

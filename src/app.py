@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User
+from models import db, User, Planets
 #from models import Person
 
 app = Flask(__name__)
@@ -62,6 +62,37 @@ def handle_hello():
          #en caso de error se captura la excepcion
         print(f"Error al obtener los ususarios: {error}")
         return jsonify({"msg": "Internal Server Error", "error": str(error)}), 500
+    
+
+@app.route('/planets', methods=['GET'])
+def get_planets():
+
+    try:
+
+        # Buscar todos los planetas
+        planets = Planets.query.all()
+
+        # Convertir a lista de diccionarios
+        planets_list = [planet.serialize() for planet in planets]
+
+        # Si no hay planetas
+        if len(planets_list) == 0:
+            return jsonify({
+                "message": "No planets found"
+            }), 404
+
+        # Respuesta exitosa
+        return jsonify({
+            "results": planets_list
+        }), 200
+
+    except Exception as e:
+
+        # Manejo de errores inesperados
+        return jsonify({
+            "error": "Something went wrong",
+            "message": str(e)
+        }), 500
 
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':

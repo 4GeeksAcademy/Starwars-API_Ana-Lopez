@@ -39,11 +39,29 @@ def sitemap():
 @app.route('/user', methods=['GET'])
 def handle_hello():
 
-    response_body = {
-        "msg": "Hello, this is your GET /user response "
-    }
+    try:
+        # consultar a la base de datos los registros de usuarios
+        query_results= User.query.all()
 
-    return jsonify(response_body), 200
+        # validar si la lista esta vacia
+        if not query_results:
+            return jsonify({"msg": "Usuarios no encontrados"}), 400 
+
+        # aplico map para usar serialize()
+        results= list(map(lambda item: item.serialize(), query_results))
+
+
+        response_body = {
+            "msg": "lista de usuarios encontrada",
+            "results": results
+        }
+
+        return jsonify(response_body), 200
+           
+    except Exception as error:
+         #en caso de error se captura la excepcion
+        print(f"Error al obtener los ususarios: {error}")
+        return jsonify({"msg": "Internal Server Error", "error": str(error)}), 500
 
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
